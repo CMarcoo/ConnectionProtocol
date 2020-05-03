@@ -79,9 +79,9 @@ class NetInStream(inputStream: InputStream) : NetIn {
                 + ((readBytes[2].toLong() and 255) shl 40)
                 + ((readBytes[3].toLong() and 255) shl 32)
                 + ((readBytes[4].toLong() and 255) shl 24)
-                + ((readBytes[5].toLong() and 255) shl 16)
-                + ((readBytes[6].toLong() and 255) shl 8)
-                + ((readBytes[7].toLong() and 255) shl 0))
+                + ((readBytes[5].toInt() and 255) shl 16)
+                + ((readBytes[6].toInt() and 255) shl 8)
+                + ((readBytes[7].toInt() and 255) shl 0))
     }
 
     @Throws(IOException::class)
