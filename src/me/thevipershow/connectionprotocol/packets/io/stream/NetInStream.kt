@@ -6,12 +6,10 @@ import java.io.IOException
 import java.io.InputStream
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
-import java.util.*
+import java.util.UUID;
 import kotlin.experimental.and
 
-class NetInStream(inputStream: InputStream) : NetIn {
-    private var inputStream = inputStream
-
+class NetInStream(var inputStream: InputStream) : NetIn {
     @Throws(IOException::class)
     override fun readBoolean(): Boolean {
         return readByte().compareTo(1) == 0

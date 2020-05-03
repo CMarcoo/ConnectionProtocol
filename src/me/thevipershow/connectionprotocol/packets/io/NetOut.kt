@@ -29,6 +29,9 @@ interface NetOut {
     fun writeVarLong(varLong: Long)
 
     @Throws(IOException::class)
+    fun writeFloat(float: Float)
+
+    @Throws(IOException::class)
     fun writeDouble(double: Double)
 
     @Throws(IOException::class)
