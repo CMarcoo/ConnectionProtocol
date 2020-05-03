@@ -5,6 +5,7 @@ import java.io.EOFException
 import java.io.IOException
 import java.io.InputStream
 import java.util.*
+import kotlin.experimental.and
 
 class NetInStream(inputStream: InputStream) : NetIn {
     private var inputStream = inputStream;
@@ -56,7 +57,17 @@ class NetInStream(inputStream: InputStream) : NetIn {
 
     @Throws(IOException::class)
     override fun readVarInt(): Int {
-        TODO("Not yet implemented")
+        var value: Int = 0;
+        var size: Int = 0;
+        var byte: Byte;
+        do {
+            byte = this.readByte();
+            value = value or ((byte and 0x7F.toByte()).toInt() shl (size++ * 7))
+            if (size > 5) {
+                IOException("VarInt length is greater than 5")
+            }
+        } while ((byte and 0x80.toByte()) == 0x80.toByte())
+        return value or ((byte and 0x7F).toInt() shl (size * 7))
     }
 
     @Throws(IOException::class)
