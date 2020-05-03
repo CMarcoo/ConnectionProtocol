@@ -4,12 +4,13 @@ import packets.io.NetIn
 import java.io.EOFException
 import java.io.IOException
 import java.io.InputStream
+import java.nio.charset.Charset
+import java.nio.charset.StandardCharsets
 import java.util.*
 import kotlin.experimental.and
 
 class NetInStream(inputStream: InputStream) : NetIn {
-    private var inputStream = inputStream;
-
+    private var inputStream = inputStream
 
     @Throws(IOException::class)
     override fun readBoolean(): Boolean {
@@ -18,7 +19,7 @@ class NetInStream(inputStream: InputStream) : NetIn {
 
     @Throws(IOException::class)
     override fun readByte(): Byte {
-        return readUnsignedByte().toByte();
+        return readUnsignedByte().toByte()
     }
 
     @Throws(IOException::class)
@@ -57,9 +58,9 @@ class NetInStream(inputStream: InputStream) : NetIn {
 
     @Throws(IOException::class)
     override fun readVarInt(): Int {
-        var value: Int = 0;
-        var size: Int = 0;
-        var byte: Byte;
+        var value: Int = 0
+        var size: Int = 0
+        var byte: Byte
         do {
             byte = this.readByte();
             value = value or ((byte and 0x7F.toByte()).toInt() shl (size++ * 7))
@@ -72,96 +73,169 @@ class NetInStream(inputStream: InputStream) : NetIn {
 
     @Throws(IOException::class)
     override fun readLong(): Long {
-        TODO("Not yet implemented")
+        val readBytes: ByteArray = this.readBytes(8)
+        return ((readBytes[0].toLong() shl 56)
+                + ((readBytes[1].toLong() and 255) shl 48)
+                + ((readBytes[2].toLong() and 255) shl 40)
+                + ((readBytes[3].toLong() and 255) shl 32)
+                + ((readBytes[4].toLong() and 255) shl 24)
+                + ((readBytes[5].toLong() and 255) shl 16)
+                + ((readBytes[6].toLong() and 255) shl 8)
+                + ((readBytes[7].toLong() and 255) shl 0))
     }
 
     @Throws(IOException::class)
     override fun readVarLong(): Long {
-        TODO("Not yet implemented")
+        var value = 0L
+        var size = 0
+        var byte: Byte
+        do {
+            byte = this.readByte();
+            value = value or ((byte and 0x7F.toByte()).toLong() shl (size++ * 7))
+            if (size > 10) {
+                IOException("VarInt length is greater than 10")
+            }
+        } while ((byte and 0x80.toByte()) == 0x80.toByte())
+        return (value or ((byte and 0x7F).toLong() shl (size * 7)))
     }
 
     @Throws(IOException::class)
     override fun readFloat(): Float {
-        TODO("Not yet implemented")
+        return Float.fromBits(this.readInt())
     }
 
     @Throws(IOException::class)
     override fun readDouble(): Double {
-        TODO("Not yet implemented")
+        return Double.fromBits(this.readLong())
     }
 
     @Throws(IOException::class)
     override fun readBytes(length: Int): ByteArray {
-        TODO("Not yet implemented")
+        if (length < 0) {
+            IllegalArgumentException("Array size can't be < 0")
+        }
+        val bytes = ByteArray(length)
+        var n = 0;
+        while (n < length) {
+            val count = this.inputStream.read(bytes, n, length - n)
+            if (count < 0) {
+                EOFException()
+            }
+            n += count
+        }
+        return bytes
     }
 
     @Throws(IOException::class)
     override fun readBytes(bytes: ByteArray): Int {
-        TODO("Not yet implemented")
+        return this.inputStream.read(bytes)
     }
 
     @Throws(IOException::class)
     override fun readBytes(bytes: ByteArray, offset: Int, length: Int): Int {
-        TODO("Not yet implemented")
+        return this.inputStream.read(bytes, offset, length)
     }
 
     @Throws(IOException::class)
     override fun readShorts(length: Int): ShortArray {
-        TODO("Not yet implemented")
+        if (length < 0) {
+            IllegalArgumentException("Array size can't be < 0")
+        }
+        val shorts = ShortArray(length)
+        if (this.readShorts(shorts) < length) {
+            EOFException()
+        }
+        return shorts
     }
 
     @Throws(IOException::class)
     override fun readShorts(shorts: ShortArray): Int {
-        TODO("Not yet implemented")
+        return this.readShorts(shorts, 0, shorts.size)
     }
 
     @Throws(IOException::class)
     override fun readShorts(shorts: ShortArray, offset: Int, length: Int): Int {
-        TODO("Not yet implemented")
+        for (i in offset.rangeTo(offset + length)) {
+            try {
+                shorts[i] = this.readShort()
+            } catch (eofException: EOFException) {
+                return i - offset
+            }
+        }
+        return length
     }
 
     @Throws(IOException::class)
     override fun readInts(length: Int): IntArray {
-        TODO("Not yet implemented")
+        if (length < 0) {
+            IllegalArgumentException("Array size can't be < 0")
+        }
+        val ints = IntArray(length)
+        if (this.readInts(ints) < length) {
+            EOFException()
+        }
+        return ints
     }
 
     @Throws(IOException::class)
     override fun readInts(ints: IntArray): Int {
-        TODO("Not yet implemented")
+        return this.readInts(ints, 0, ints.size)
     }
 
     @Throws(IOException::class)
     override fun readInts(ints: IntArray, offset: Int, length: Int): Int {
-        TODO("Not yet implemented")
+        for (i in offset.rangeTo(offset + length)) {
+            try {
+                ints[i] = this.readInt()
+            } catch (eofException: EOFException) {
+                return i - offset
+            }
+        }
+        return length
     }
 
     @Throws(IOException::class)
     override fun readLongs(length: Int): LongArray {
-        TODO("Not yet implemented")
+        if (length < 0) {
+            IllegalArgumentException("Array size can't be < 0")
+        }
+        val longs = LongArray(length)
+        if (this.readLongs(longs) < length) {
+            EOFException()
+        }
+        return longs
     }
 
     @Throws(IOException::class)
-    override fun readLongs(longs: LongArray): LongArray {
-        TODO("Not yet implemented")
+    override fun readLongs(longs: LongArray): Int {
+        return this.readLongs(longs, 0, longs.size)
     }
 
     @Throws(IOException::class)
     override fun readLongs(longs: LongArray, offset: Int, length: Int): Int {
-        TODO("Not yet implemented")
+        for (i in offset.rangeTo(offset + length)) {
+            try {
+                longs[i] = this.readLong()
+            } catch (eofException: EOFException) {
+                return i - offset
+            }
+        }
+        return length
     }
 
     @Throws(IOException::class)
     override fun readString(): String {
-        TODO("Not yet implemented")
+        val bytes = this.readBytes(this.readVarInt())
+        return String(bytes, Charsets.UTF_8)
     }
 
     @Throws(IOException::class)
     override fun readUUID(): UUID {
-        TODO("Not yet implemented")
+        return UUID(this.readLong(), this.readLong())
     }
 
     @Throws(IOException::class)
     override fun available(): Int {
-        TODO("Not yet implemented")
+        return this.inputStream.available()
     }
 }

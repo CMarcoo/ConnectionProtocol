@@ -71,7 +71,7 @@ interface NetIn {
     fun readLongs(length: Int): LongArray
 
     @Throws(IOException::class)
-    fun readLongs(longs: LongArray): LongArray
+    fun readLongs(longs: LongArray): Int
 
     @Throws(IOException::class)
     fun readLongs(longs: LongArray, offset: Int, length: Int): Int
