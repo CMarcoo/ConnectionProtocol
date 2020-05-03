@@ -1,7 +1,7 @@
-package packets
+package me.thevipershow.connectionprotocol.packets
 
-import packets.io.NetIn
-import packets.io.NetOut
+import me.thevipershow.connectionprotocol.packets.io.NetIn
+import me.thevipershow.connectionprotocol.packets.io.NetOut
 import java.io.IOException
 
 interface Packet {

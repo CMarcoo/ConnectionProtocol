@@ -1,7 +1,7 @@
-package packets.io
+package me.thevipershow.connectionprotocol.packets.io
 
 import java.io.IOException
-import java.util.*
+import java.util.UUID
 
 interface NetIn {
     @Throws(IOException::class)

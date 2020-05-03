@@ -1,11 +1,9 @@
 package me.thevipershow.connectionprotocol.packets.io.stream
 
-import packets.io.NetIn
+import me.thevipershow.connectionprotocol.packets.io.NetIn
 import java.io.EOFException
 import java.io.IOException
 import java.io.InputStream
-import java.nio.charset.Charset
-import java.nio.charset.StandardCharsets
 import java.util.UUID;
 import kotlin.experimental.and
 

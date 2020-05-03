@@ -1,6 +1,6 @@
 package me.thevipershow.connectionprotocol.packets.io.stream
 
-import packets.io.NetOut
+import me.thevipershow.connectionprotocol.packets.io.NetOut
 import java.io.IOException
 import java.io.OutputStream
 import java.util.UUID
