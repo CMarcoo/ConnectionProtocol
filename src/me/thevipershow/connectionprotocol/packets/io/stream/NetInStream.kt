@@ -8,42 +8,35 @@ import java.util.UUID;
 import kotlin.experimental.and
 
 class NetInStream(var inputStream: InputStream) : NetIn {
-    @Throws(IOException::class)
     override fun readBoolean(): Boolean {
         return readByte().compareTo(1) == 0
     }
 
-    @Throws(IOException::class)
     override fun readByte(): Byte {
         return readUnsignedByte().toByte()
     }
 
-    @Throws(IOException::class)
     override fun readUnsignedByte(): Int {
         val read = this.inputStream.read()
         return if (read > 0) read else throw EOFException()
     }
 
-    @Throws(IOException::class)
     override fun readShort(): Short {
         return readUnsignedShort().toShort()
     }
 
-    @Throws(IOException::class)
     override fun readUnsignedShort(): Int {
         val v1 = this.readUnsignedByte()
         val v2 = this.readUnsignedByte()
         return ((v1 shl 8) + (v2 shl 0))
     }
 
-    @Throws(IOException::class)
     override fun readChar(): Char {
         val v1 = this.readUnsignedByte()
         val v2 = this.readUnsignedByte()
         return ((v1 shl 8) + (v2 shl 0)).toChar()
     }
 
-    @Throws(IOException::class)
     override fun readInt(): Int {
         val v1 = this.readUnsignedByte()
         val v2 = this.readUnsignedByte()
@@ -52,7 +45,6 @@ class NetInStream(var inputStream: InputStream) : NetIn {
         return ((v1 shl 24) + (v2 shl 16) + (v3 shl 8) + (v4 shl 0))
     }
 
-    @Throws(IOException::class)
     override fun readVarInt(): Int {
         var value = 0
         var size = 0
@@ -69,7 +61,6 @@ class NetInStream(var inputStream: InputStream) : NetIn {
         return value or ((byte and 0x7F).toInt() shl (size * 7))
     }
 
-    @Throws(IOException::class)
     override fun readLong(): Long {
         val readBytes: ByteArray = this.readBytes(8)
         return ((readBytes[0].toLong() shl 56)
@@ -82,7 +73,6 @@ class NetInStream(var inputStream: InputStream) : NetIn {
                 + ((readBytes[7].toInt() and 255) shl 0))
     }
 
-    @Throws(IOException::class)
     override fun readVarLong(): Long {
         var value = 0L
         var size = 0
@@ -99,17 +89,14 @@ class NetInStream(var inputStream: InputStream) : NetIn {
         return (value or ((byte and 0x7F).toLong() shl (size * 7)))
     }
 
-    @Throws(IOException::class)
     override fun readFloat(): Float {
         return Float.fromBits(this.readInt())
     }
 
-    @Throws(IOException::class)
     override fun readDouble(): Double {
         return Double.fromBits(this.readLong())
     }
 
-    @Throws(IOException::class)
     override fun readBytes(length: Int): ByteArray {
         if (length < 0) {
             IllegalArgumentException("Array size can't be < 0")
@@ -126,17 +113,14 @@ class NetInStream(var inputStream: InputStream) : NetIn {
         return bytes
     }
 
-    @Throws(IOException::class)
     override fun readBytes(bytes: ByteArray): Int {
         return this.inputStream.read(bytes)
     }
 
-    @Throws(IOException::class)
     override fun readBytes(bytes: ByteArray, offset: Int, length: Int): Int {
         return this.inputStream.read(bytes, offset, length)
     }
 
-    @Throws(IOException::class)
     override fun readShorts(length: Int): ShortArray {
         if (length < 0) {
             IllegalArgumentException("Array size can't be < 0")
@@ -148,12 +132,10 @@ class NetInStream(var inputStream: InputStream) : NetIn {
         return shorts
     }
 
-    @Throws(IOException::class)
     override fun readShorts(shorts: ShortArray): Int {
         return this.readShorts(shorts, 0, shorts.size)
     }
 
-    @Throws(IOException::class)
     override fun readShorts(shorts: ShortArray, offset: Int, length: Int): Int {
         for (i in offset until (offset + length)) {
             try {
@@ -165,7 +147,6 @@ class NetInStream(var inputStream: InputStream) : NetIn {
         return length
     }
 
-    @Throws(IOException::class)
     override fun readInts(length: Int): IntArray {
         if (length < 0) {
             IllegalArgumentException("Array size can't be < 0")
@@ -177,12 +158,10 @@ class NetInStream(var inputStream: InputStream) : NetIn {
         return ints
     }
 
-    @Throws(IOException::class)
     override fun readInts(ints: IntArray): Int {
         return this.readInts(ints, 0, ints.size)
     }
 
-    @Throws(IOException::class)
     override fun readInts(ints: IntArray, offset: Int, length: Int): Int {
         for (i in offset until (offset + length)) {
             try {
@@ -194,7 +173,6 @@ class NetInStream(var inputStream: InputStream) : NetIn {
         return length
     }
 
-    @Throws(IOException::class)
     override fun readLongs(length: Int): LongArray {
         if (length < 0) {
             IllegalArgumentException("Array size can't be < 0")
@@ -206,12 +184,10 @@ class NetInStream(var inputStream: InputStream) : NetIn {
         return longs
     }
 
-    @Throws(IOException::class)
     override fun readLongs(longs: LongArray): Int {
         return this.readLongs(longs, 0, longs.size)
     }
 
-    @Throws(IOException::class)
     override fun readLongs(longs: LongArray, offset: Int, length: Int): Int {
         for (i in offset until (offset + length)) {
             try {
@@ -223,18 +199,15 @@ class NetInStream(var inputStream: InputStream) : NetIn {
         return length
     }
 
-    @Throws(IOException::class)
     override fun readString(): String {
         val bytes = this.readBytes(this.readVarInt())
         return String(bytes, Charsets.UTF_8)
     }
 
-    @Throws(IOException::class)
     override fun readUUID(): UUID {
         return UUID(this.readLong(), this.readLong())
     }
 
-    @Throws(IOException::class)
     override fun available(): Int {
         return this.inputStream.available()
     }
