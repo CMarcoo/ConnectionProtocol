@@ -6,7 +6,6 @@ import java.io.OutputStream
 import java.util.UUID
 
 class NetOutStream(var outputStream: OutputStream) : NetOut {
-
     @Throws(IOException::class)
     override fun writeBoolean(boolean: Boolean) {
         this.writeByte(if (boolean) 1 else 0)

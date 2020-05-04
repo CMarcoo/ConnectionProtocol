@@ -155,7 +155,7 @@ class NetInStream(var inputStream: InputStream) : NetIn {
 
     @Throws(IOException::class)
     override fun readShorts(shorts: ShortArray, offset: Int, length: Int): Int {
-        for (i in offset.rangeTo(offset + length)) {
+        for (i in offset until (offset + length)) {
             try {
                 shorts[i] = this.readShort()
             } catch (eofException: EOFException) {
@@ -184,7 +184,7 @@ class NetInStream(var inputStream: InputStream) : NetIn {
 
     @Throws(IOException::class)
     override fun readInts(ints: IntArray, offset: Int, length: Int): Int {
-        for (i in offset.rangeTo(offset + length)) {
+        for (i in offset until (offset + length)) {
             try {
                 ints[i] = this.readInt()
             } catch (eofException: EOFException) {
@@ -213,7 +213,7 @@ class NetInStream(var inputStream: InputStream) : NetIn {
 
     @Throws(IOException::class)
     override fun readLongs(longs: LongArray, offset: Int, length: Int): Int {
-        for (i in offset.rangeTo(offset + length)) {
+        for (i in offset until (offset + length)) {
             try {
                 longs[i] = this.readLong()
             } catch (eofException: EOFException) {
