@@ -2,8 +2,8 @@ package me.thevipershow.connectionprotocol.packets.event.session
 
 import me.thevipershow.connectionprotocol.packets.Session
 
-class ConnectedEvent(val session: Session): SessionEvent {
+class DisconnectedEvent(val reason: String, val session: Session, val cause: Throwable? = null) : SessionEvent {
     override fun call(listener: SessionListener) {
-        listener.connected(this)
+        listener.disconnected(this)
     }
 }

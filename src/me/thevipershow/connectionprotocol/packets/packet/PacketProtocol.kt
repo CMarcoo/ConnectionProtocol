@@ -1,7 +1,10 @@
 package me.thevipershow.connectionprotocol.packets.packet
 
+import me.thevipershow.connectionprotocol.packets.Client
+import me.thevipershow.connectionprotocol.packets.Server
+import me.thevipershow.connectionprotocol.packets.Session
+import me.thevipershow.connectionprotocol.packets.crypt.PacketEncryption
 import java.lang.Exception
-import java.lang.reflect.Constructor
 
 abstract class PacketProtocol {
     private val incoming = HashMap<Int, Class<out Packet>>()
@@ -23,6 +26,12 @@ abstract class PacketProtocol {
     }
 
     @Throws(IllegalArgumentException::class)
+    fun register(ID: Int, packet: Class<out Packet>) {
+        this.registerIncoming(ID, packet)
+        this.registerOutgoing(ID, packet)
+    }
+
+    @Throws(IllegalArgumentException::class)
     fun registerIncoming(ID: Int, packet: Class<out Packet>) {
         this.incoming[ID] = packet
         try {
@@ -32,7 +41,6 @@ abstract class PacketProtocol {
             throw IllegalArgumentException(state.message, state.cause)
         }
     }
-
 
     fun registerOutgoing(ID: Int, packet: Class<out Packet>) {
         this.outgoing[packet] = ID
@@ -55,12 +63,6 @@ abstract class PacketProtocol {
         } catch (exc: Exception) {
             throw IllegalStateException("Packet [$ID, ${packet.name}] couldn't be instantiated")
         }
-    }
-
-    @Throws(IllegalArgumentException::class)
-    fun register(ID: Int, packet: Class<out Packet>) {
-        this.registerIncoming(ID, packet)
-        this.registerOutgoing(ID, packet)
     }
 
     @Throws(IllegalArgumentException::class)
