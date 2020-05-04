@@ -54,16 +54,18 @@ class NetInStream(var inputStream: InputStream) : NetIn {
 
     @Throws(IOException::class)
     override fun readVarInt(): Int {
-        var value: Int = 0
-        var size: Int = 0
-        var byte: Byte
-        do {
-            byte = this.readByte();
+        var value = 0
+        var size = 0
+        var byte: Byte = this.readByte()
+
+        while ((byte and 0x80.toByte()) == 0x80.toByte()) {
             value = value or ((byte and 0x7F.toByte()).toInt() shl (size++ * 7))
             if (size > 5) {
                 IOException("VarInt length is greater than 5")
+            } else {
+                byte = this.readByte()
             }
-        } while ((byte and 0x80.toByte()) == 0x80.toByte())
+        }
         return value or ((byte and 0x7F).toInt() shl (size * 7))
     }
 
@@ -84,14 +86,16 @@ class NetInStream(var inputStream: InputStream) : NetIn {
     override fun readVarLong(): Long {
         var value = 0L
         var size = 0
-        var byte: Byte
-        do {
-            byte = this.readByte();
+        var byte: Byte = this.readByte()
+
+        while ((byte and 0x80.toByte()) == 0x80.toByte()) {
             value = value or ((byte and 0x7F.toByte()).toLong() shl (size++ * 7))
             if (size > 10) {
                 IOException("VarInt length is greater than 10")
+            } else {
+                byte = this.readByte()
             }
-        } while ((byte and 0x80.toByte()) == 0x80.toByte())
+        }
         return (value or ((byte and 0x7F).toLong() shl (size * 7)))
     }
 

@@ -1,11 +1,12 @@
 package me.thevipershow.connectionprotocol.packets.io.buffer
 
 import me.thevipershow.connectionprotocol.packets.io.NetIn
+import java.io.IOException
 import java.nio.ByteBuffer
-import java.util.*
+import java.util.UUID
 import kotlin.experimental.and
 
-class ByteBufferNetIn(var buffer: ByteBuffer): NetIn {
+class ByteBufferNetIn(var buffer: ByteBuffer) : NetIn {
     override fun readBoolean(): Boolean {
         return this.buffer.get() == 1.toByte()
     }
@@ -27,91 +28,190 @@ class ByteBufferNetIn(var buffer: ByteBuffer): NetIn {
     }
 
     override fun readChar(): Char {
-        TODO("Not yet implemented")
+        return this.buffer.char
     }
 
     override fun readInt(): Int {
-        TODO("Not yet implemented")
+        return this.buffer.int
     }
 
     override fun readVarInt(): Int {
-        TODO("Not yet implemented")
+        var value = 0
+        var size = 0
+        var byte: Byte = this.readByte()
+
+        while ((byte and 0x80.toByte()) == 0x80.toByte()) {
+            value = value or ((byte and 0x7F.toByte()).toInt() shl (size++ * 7))
+            if (size > 5) {
+                IOException("VarInt length is greater than 5")
+            } else {
+                byte = this.readByte()
+            }
+        }
+        return value or ((byte and 0x7F).toInt() shl (size * 7))
     }
 
     override fun readLong(): Long {
-        TODO("Not yet implemented")
+        return this.buffer.long
     }
 
     override fun readVarLong(): Long {
-        TODO("Not yet implemented")
+        var value = 0L
+        var size = 0
+        var byte: Byte = this.readByte()
+
+        while ((byte and 0x80.toByte()) == 0x80.toByte()) {
+            value = value or ((byte and 0x7F.toByte()).toLong() shl (size++ * 7))
+            if (size > 10) {
+                IOException("VarInt length is greater than 10")
+            } else {
+                byte = this.readByte()
+            }
+        }
+        return (value or ((byte and 0x7F).toLong() shl (size * 7)))
     }
 
     override fun readFloat(): Float {
-        TODO("Not yet implemented")
+        return this.buffer.float
     }
 
     override fun readDouble(): Double {
-        TODO("Not yet implemented")
+        return this.buffer.double
     }
 
     override fun readBytes(length: Int): ByteArray {
-        TODO("Not yet implemented")
+        if (length < 0) {
+            IllegalArgumentException("Array length can't be less than 0")
+        }
+        val bytes = ByteArray(length)
+        this.buffer.get(bytes)
+        return bytes
     }
 
     override fun readBytes(bytes: ByteArray): Int {
-        TODO("Not yet implemented")
+        return this.readBytes(bytes, 0, bytes.size)
     }
 
     override fun readBytes(bytes: ByteArray, offset: Int, length: Int): Int {
-        TODO("Not yet implemented")
+        val remaining = this.buffer.remaining()
+        var l: Int = length
+        if (remaining <= 0) {
+            return -1
+        } else if (remaining < l) {
+            l = remaining
+        }
+
+        this.buffer.get(bytes, offset, l)
+        return l
     }
 
     override fun readShorts(length: Int): ShortArray {
-        TODO("Not yet implemented")
+        if (length < 0) {
+            IllegalArgumentException("Array length can't be less than 0")
+        }
+
+        val shorts = ShortArray(length)
+        for (i in 0 until length) {
+            shorts[i] = this.readShort()
+        }
+        return shorts
     }
 
     override fun readShorts(shorts: ShortArray): Int {
-        TODO("Not yet implemented")
+        return this.readShorts(shorts, 0, shorts.size)
     }
 
     override fun readShorts(shorts: ShortArray, offset: Int, length: Int): Int {
-        TODO("Not yet implemented")
+        val remaining: Int = this.buffer.remaining()
+        var l: Int = length
+        if (remaining <= 0) {
+            return -1
+        } else if (remaining < l * 2) {
+            l = remaining / 2
+        }
+
+        for (i in offset until (length + offset)) {
+            shorts[i] = this.readShort()
+        }
+        return l
     }
 
     override fun readInts(length: Int): IntArray {
-        TODO("Not yet implemented")
+        if (length < 0) {
+            IllegalArgumentException("Array length can't be less than 0")
+        }
+
+        val ints = IntArray(length)
+        for (i in 0 until length) {
+            ints[i] = this.readInt()
+        }
+
+        return ints
     }
 
     override fun readInts(ints: IntArray): Int {
-        TODO("Not yet implemented")
+        return this.readInts(ints, 0, ints.size)
     }
 
     override fun readInts(ints: IntArray, offset: Int, length: Int): Int {
-        TODO("Not yet implemented")
+        val remaining = this.buffer.remaining()
+        var l = length
+        if (remaining <= 0) {
+            return -1
+        } else if (remaining < l * 4) {
+            l = remaining / 4
+        }
+        for (i in offset until (offset + l)) {
+            ints[i] = this.readInt()
+        }
+
+        return length
     }
 
     override fun readLongs(length: Int): LongArray {
-        TODO("Not yet implemented")
+        if (length < 0) {
+            IllegalArgumentException("Array size can't be less than 0")
+        }
+
+        val longs = LongArray(length)
+        for (i in 0 until length) {
+            longs[i] = this.readLong()
+        }
+
+        return longs
     }
 
     override fun readLongs(longs: LongArray): Int {
-        TODO("Not yet implemented")
+        return this.readLongs(longs, 0, longs.size)
     }
 
     override fun readLongs(longs: LongArray, offset: Int, length: Int): Int {
-        TODO("Not yet implemented")
+        val remaining = this.buffer.remaining()
+        var l = length
+        if (remaining <= 0) {
+            return -1
+        } else if (remaining < l * 2) {
+            l = remaining / 2
+        }
+
+        for (i in offset until (offset + l)) {
+            longs[i] = this.readLong()
+        }
+
+        return l
     }
 
     override fun readString(): String {
-        TODO("Not yet implemented")
+        val length = this.readVarInt()
+        val bytes = this.readBytes(length)
+        return String(bytes, Charsets.UTF_8)
     }
 
     override fun readUUID(): UUID {
-        TODO("Not yet implemented")
+        return UUID(this.readLong(), this.readLong())
     }
 
     override fun available(): Int {
-        TODO("Not yet implemented")
+        return this.buffer.remaining()
     }
-
 }
