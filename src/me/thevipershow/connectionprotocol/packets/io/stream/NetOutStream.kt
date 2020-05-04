@@ -104,7 +104,7 @@ class NetOutStream(private val outputStream: OutputStream) : NetOut {
     override fun writeString(string: String) {
         val bytes = string.toByteArray(Charsets.UTF_8)
         if (bytes.size > Short.MAX_VALUE) {
-            IOException("String is too big ( ${bytes.size} bytes, max ${Short.MAX_VALUE} )")
+            throw IOException("String is too big ( ${bytes.size} bytes, max ${Short.MAX_VALUE} )")
         } else {
             this.writeVarInt(bytes.size)
             this.writeBytes(bytes)

@@ -1,4 +1,4 @@
-package me.thevipershow.connectionprotocol.packets
+package me.thevipershow.connectionprotocol.packets.packet
 
 import me.thevipershow.connectionprotocol.packets.io.NetIn
 import me.thevipershow.connectionprotocol.packets.io.NetOut

@@ -6,7 +6,7 @@ import java.nio.ByteBuffer
 import java.util.UUID
 import kotlin.experimental.and
 
-class ByteBufferNetIn(private val buffer: ByteBuffer) : NetIn {
+class ByteBufferNetIn(val buffer: ByteBuffer) : NetIn {
     override fun readBoolean(): Boolean {
         return this.buffer.get() == 1.toByte()
     }
@@ -43,7 +43,7 @@ class ByteBufferNetIn(private val buffer: ByteBuffer) : NetIn {
         while ((byte and 0x80.toByte()) == 0x80.toByte()) {
             value = value or ((byte and 0x7F.toByte()).toInt() shl (size++ * 7))
             if (size > 5) {
-                IOException("VarInt length is greater than 5")
+                throw IOException("VarInt length is greater than 5")
             } else {
                 byte = this.readByte()
             }
@@ -63,7 +63,7 @@ class ByteBufferNetIn(private val buffer: ByteBuffer) : NetIn {
         while ((byte and 0x80.toByte()) == 0x80.toByte()) {
             value = value or ((byte and 0x7F.toByte()).toLong() shl (size++ * 7))
             if (size > 10) {
-                IOException("VarInt length is greater than 10")
+                throw IOException("VarInt length is greater than 10")
             } else {
                 byte = this.readByte()
             }
@@ -81,7 +81,7 @@ class ByteBufferNetIn(private val buffer: ByteBuffer) : NetIn {
 
     override fun readBytes(length: Int): ByteArray {
         if (length < 0) {
-            IllegalArgumentException("Array length can't be less than 0")
+            throw IllegalArgumentException("Array length can't be less than 0")
         }
         val bytes = ByteArray(length)
         this.buffer.get(bytes)
@@ -107,7 +107,7 @@ class ByteBufferNetIn(private val buffer: ByteBuffer) : NetIn {
 
     override fun readShorts(length: Int): ShortArray {
         if (length < 0) {
-            IllegalArgumentException("Array length can't be less than 0")
+            throw IllegalArgumentException("Array length can't be less than 0")
         }
 
         val shorts = ShortArray(length)
@@ -138,7 +138,7 @@ class ByteBufferNetIn(private val buffer: ByteBuffer) : NetIn {
 
     override fun readInts(length: Int): IntArray {
         if (length < 0) {
-            IllegalArgumentException("Array length can't be less than 0")
+            throw IllegalArgumentException("Array length can't be less than 0")
         }
 
         val ints = IntArray(length)
@@ -170,7 +170,7 @@ class ByteBufferNetIn(private val buffer: ByteBuffer) : NetIn {
 
     override fun readLongs(length: Int): LongArray {
         if (length < 0) {
-            IllegalArgumentException("Array size can't be less than 0")
+            throw IllegalArgumentException("Array size can't be less than 0")
         }
 
         val longs = LongArray(length)

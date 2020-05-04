@@ -53,7 +53,7 @@ class NetInStream(private val inputStream: InputStream) : NetIn {
         while ((byte and 0x80.toByte()) == 0x80.toByte()) {
             value = value or ((byte and 0x7F.toByte()).toInt() shl (size++ * 7))
             if (size > 5) {
-                IOException("VarInt length is greater than 5")
+                throw IOException("VarInt length is greater than 5")
             } else {
                 byte = this.readByte()
             }
@@ -81,7 +81,7 @@ class NetInStream(private val inputStream: InputStream) : NetIn {
         while ((byte and 0x80.toByte()) == 0x80.toByte()) {
             value = value or ((byte and 0x7F.toByte()).toLong() shl (size++ * 7))
             if (size > 10) {
-                IOException("VarInt length is greater than 10")
+                throw IOException("VarInt length is greater than 10")
             } else {
                 byte = this.readByte()
             }
@@ -99,14 +99,14 @@ class NetInStream(private val inputStream: InputStream) : NetIn {
 
     override fun readBytes(length: Int): ByteArray {
         if (length < 0) {
-            IllegalArgumentException("Array size can't be < 0")
+            throw IllegalArgumentException("Array size can't be < 0")
         }
         val bytes = ByteArray(length)
         var n = 0;
         while (n < length) {
             val count = this.inputStream.read(bytes, n, length - n)
             if (count < 0) {
-                EOFException()
+                throw EOFException()
             }
             n += count
         }
@@ -123,11 +123,11 @@ class NetInStream(private val inputStream: InputStream) : NetIn {
 
     override fun readShorts(length: Int): ShortArray {
         if (length < 0) {
-            IllegalArgumentException("Array size can't be < 0")
+            throw  IllegalArgumentException("Array size can't be < 0")
         }
         val shorts = ShortArray(length)
         if (this.readShorts(shorts) < length) {
-            EOFException()
+            throw   EOFException()
         }
         return shorts
     }
@@ -149,11 +149,11 @@ class NetInStream(private val inputStream: InputStream) : NetIn {
 
     override fun readInts(length: Int): IntArray {
         if (length < 0) {
-            IllegalArgumentException("Array size can't be < 0")
+            throw IllegalArgumentException("Array size can't be < 0")
         }
         val ints = IntArray(length)
         if (this.readInts(ints) < length) {
-            EOFException()
+            throw   EOFException()
         }
         return ints
     }
@@ -175,11 +175,11 @@ class NetInStream(private val inputStream: InputStream) : NetIn {
 
     override fun readLongs(length: Int): LongArray {
         if (length < 0) {
-            IllegalArgumentException("Array size can't be < 0")
+            throw IllegalArgumentException("Array size can't be < 0")
         }
         val longs = LongArray(length)
         if (this.readLongs(longs) < length) {
-            EOFException()
+            throw EOFException()
         }
         return longs
     }
