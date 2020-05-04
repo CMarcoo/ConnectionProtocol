@@ -6,7 +6,7 @@ import java.nio.ByteBuffer
 import java.util.UUID
 import kotlin.experimental.and
 
-class ByteBufferNetIn(var buffer: ByteBuffer) : NetIn {
+class ByteBufferNetIn(private val buffer: ByteBuffer) : NetIn {
     override fun readBoolean(): Boolean {
         return this.buffer.get() == 1.toByte()
     }

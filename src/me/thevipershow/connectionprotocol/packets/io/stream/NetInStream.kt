@@ -7,7 +7,7 @@ import java.io.InputStream
 import java.util.UUID;
 import kotlin.experimental.and
 
-class NetInStream(var inputStream: InputStream) : NetIn {
+class NetInStream(private val inputStream: InputStream) : NetIn {
     override fun readBoolean(): Boolean {
         return readByte().compareTo(1) == 0
     }

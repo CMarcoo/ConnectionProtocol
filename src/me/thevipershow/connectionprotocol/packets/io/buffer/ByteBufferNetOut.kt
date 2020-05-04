@@ -1,33 +1,29 @@
-package me.thevipershow.connectionprotocol.packets.io.stream
+package me.thevipershow.connectionprotocol.packets.io.buffer
 
 import me.thevipershow.connectionprotocol.packets.io.NetOut
 import java.io.IOException
-import java.io.OutputStream
+import java.nio.ByteBuffer
 import java.util.UUID
 
-class NetOutStream(private val outputStream: OutputStream) : NetOut {
+class ByteBufferNetOut(val byteBuffer: ByteBuffer) : NetOut {
     override fun writeBoolean(boolean: Boolean) {
-        this.writeByte(if (boolean) 1 else 0)
+        this.byteBuffer.put(if (boolean) 0x1 else 0x0)
     }
 
     override fun writeByte(byte: Int) {
-        this.outputStream.write(byte)
+        this.byteBuffer.put(byte.toByte())
     }
 
     override fun writeShort(short: Int) {
-        this.writeByte((short ushr 8) and 0xFF)
-        this.writeByte((short ushr 0) and 0xFF)
+        this.byteBuffer.putShort(short.toShort())
     }
 
     override fun writeChar(char: Int) {
-        this.writeByte((char ushr 8) and 0xFF)
-        this.writeByte((char ushr 8) and 0xFF)
+        this.byteBuffer.putChar(char.toChar())
     }
 
     override fun writeInt(int: Int) {
-        for (i in 24 downTo 0 step 8) {
-            this.writeByte((int ushr i) and 0xFF)
-        }
+        this.byteBuffer.putInt(int)
     }
 
     override fun writeVarInt(int: Int) {
@@ -36,14 +32,11 @@ class NetOutStream(private val outputStream: OutputStream) : NetOut {
             this.writeByte((i and 0x7F) or 0x80)
             i = i ushr 7
         }
-
         this.writeByte(i)
     }
 
     override fun writeLong(long: Long) {
-        for (i in 56 downTo 0 step 8) {
-            this.writeByte((long ushr i).toInt())
-        }
+        this.byteBuffer.putLong(long)
     }
 
     override fun writeVarLong(varLong: Long) {
@@ -56,19 +49,19 @@ class NetOutStream(private val outputStream: OutputStream) : NetOut {
     }
 
     override fun writeFloat(float: Float) {
-        this.writeInt(float.toBits())
+        this.byteBuffer.putFloat(float)
     }
 
     override fun writeDouble(double: Double) {
-        this.writeLong(double.toBits())
+        this.byteBuffer.putDouble(double)
     }
 
     override fun writeBytes(byteArray: ByteArray) {
-        this.writeBytes(byteArray, byteArray.size)
+        this.byteBuffer.put(byteArray)
     }
 
     override fun writeBytes(byteArray: ByteArray, length: Int) {
-        this.outputStream.write(byteArray, 0, length)
+        this.byteBuffer.put(byteArray, 0, length)
     }
 
     override fun writeShorts(shortArray: ShortArray) {
@@ -116,7 +109,5 @@ class NetOutStream(private val outputStream: OutputStream) : NetOut {
         this.writeLong(uuid.leastSignificantBits)
     }
 
-    override fun flush() {
-        this.outputStream.flush()
-    }
+    override fun flush() {}
 }
