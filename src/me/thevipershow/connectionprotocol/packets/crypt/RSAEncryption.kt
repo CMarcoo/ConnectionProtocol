@@ -6,6 +6,7 @@
  *  You may obtain a copy of the License at
  *  http://www.apache.org/licenses/LICENSE-2.0
  */
+
 @file:Suppress("JoinDeclarationAndAssignment")
 
 package me.thevipershow.connectionprotocol.packets.crypt
@@ -14,14 +15,14 @@ import java.security.Key
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
 
-class AESEncryption(key: Key) : PacketEncryption {
+class RSAEncryption(key: Key): PacketEncryption {
     private val inputCipher: Cipher
     private val outputCipher: Cipher
 
     init {
-        this.inputCipher = Cipher.getInstance("AES/CFB8/NoPadding")
+        this.inputCipher = Cipher.getInstance("RSA/ECB/PKCS1Padding")
         this.inputCipher.init(Cipher.DECRYPT_MODE, key, IvParameterSpec(key.encoded))
-        this.outputCipher = Cipher.getInstance("AES/CFB8/NoPadding")
+        this.outputCipher = Cipher.getInstance("RSA/ECB/PKCS1Padding")
         this.outputCipher.init(Cipher.ENCRYPT_MODE, key, IvParameterSpec(key.encoded))
     }
 
