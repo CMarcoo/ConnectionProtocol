@@ -15,7 +15,7 @@ import java.security.Key
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
 
-class RSAEncryption(key: Key): PacketEncryption {
+class RSAEncryption(key: Key) : PacketEncryption {
     private val inputCipher: Cipher
     private val outputCipher: Cipher
 
