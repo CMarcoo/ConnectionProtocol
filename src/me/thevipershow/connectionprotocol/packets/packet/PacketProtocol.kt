@@ -21,7 +21,7 @@ abstract class PacketProtocol {
 
     abstract fun getPacketHeader(): PacketHeader
 
-    abstract fun getEncryption(): PacketEncryption
+    abstract fun getEncryption(): PacketEncryption?
 
     abstract fun newClientSession(client: Client, session: Session)
 

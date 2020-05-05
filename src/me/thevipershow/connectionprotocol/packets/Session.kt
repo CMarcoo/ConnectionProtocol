@@ -66,7 +66,7 @@ interface Session {
 
     fun send(packet: Packet)
 
-    fun disconnect(reason: String)
+    fun disconnect(reason: String?)
 
-    fun disconnect(reason: String, cause: Throwable)
+    fun disconnect(reason: String?, cause: Throwable?)
 }

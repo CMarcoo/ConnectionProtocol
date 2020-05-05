@@ -10,7 +10,7 @@ package me.thevipershow.connectionprotocol.packets.event.session
 import me.thevipershow.connectionprotocol.packets.Session
 import me.thevipershow.connectionprotocol.packets.packet.Packet
 
-class PacketSendingEvent(val session: Session, private var packet: Packet, var cancelled: Boolean) : SessionEvent {
+class PacketSendingEvent(val session: Session, private var packet: Packet, var cancelled: Boolean = false) : SessionEvent {
 
     fun <T : Packet> getPacket(): T {
         try {
