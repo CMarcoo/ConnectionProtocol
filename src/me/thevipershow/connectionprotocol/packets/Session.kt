@@ -16,23 +16,25 @@ import java.net.SocketAddress
 interface Session {
     fun connect()
 
-    fun connect(wait:Boolean)
+    fun connect(wait: Boolean)
 
-    fun getHost():String
+    fun getHost(): String
 
-    fun getPort():Int
+    fun getPort(): Int
 
-    fun getLocalAddress():SocketAddress
+    fun getLocalAddress(): SocketAddress?
 
-    fun getRemoveAddress():SocketAddress
+    fun getRemoteAddress(): SocketAddress?
 
-    fun getPacketProtocol():PacketProtocol
+    fun getPacketProtocol(): PacketProtocol
 
     fun getFlags(): Map<String, Any>
 
-    fun hasFlag(key:String): Boolean
+    fun hasFlag(key: String): Boolean
 
-    fun <T> getFlag(key: String, def: T): T
+    fun <T> getFlag(key:String): T?
+
+    fun <T> getFlag(key: String, def: T): T?
 
     fun setFlag(key: String, value: Any)
 
@@ -46,9 +48,11 @@ interface Session {
 
     fun getCompressionThreshold(): Int
 
+    fun setCompressionThreshold(threshold: Int)
+
     fun getConnectionTimeout(): Int
 
-    fun setConnectionTimeout(timeout:Int)
+    fun setConnectionTimeout(timeout: Int)
 
     fun getReadTimeout(): Int
 
@@ -62,7 +66,7 @@ interface Session {
 
     fun send(packet: Packet)
 
-    fun disconnect(reason:String)
+    fun disconnect(reason: String)
 
-    fun disconnect(reason:String, cause: Throwable)
+    fun disconnect(reason: String, cause: Throwable)
 }

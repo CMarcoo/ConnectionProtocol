@@ -64,6 +64,4 @@ class Server(val host: String, val port: Int, val protocol: Class<out PacketProt
     }
 
     fun getListeners(): List<ServerListener>
-
-
 }
