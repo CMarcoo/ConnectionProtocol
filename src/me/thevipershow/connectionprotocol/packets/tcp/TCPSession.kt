@@ -84,6 +84,14 @@ abstract class TCPSession(private var host: String, private var port: Int, val p
         return this.getFlag(key, null)
     }
 
+    override fun getFlags(): Map<String, Any> {
+        return HashMap<String,Any>(this.flags)
+    }
+
+    override fun isConnected(): Boolean {
+        return this.channel != null && this.channel!!.isOpen && !this.disconnected
+    }
+
     override fun <T> getFlag(key: String, def: T): T? {
         val value = this.getFlags()[key] ?: return def
         try {
