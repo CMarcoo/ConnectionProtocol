@@ -7,16 +7,21 @@
 //
 package me.thevipershow.connectionprotocol.packets
 
-import me.thevipershow.connectionprotocol.packets.event.server.ServerListener
+import me.thevipershow.connectionprotocol.packets.event.server.*
 import me.thevipershow.connectionprotocol.packets.packet.PacketProtocol
 import java.lang.reflect.Constructor
+import java.util.stream.Collectors
 
-class Server(val host: String, val port: Int, val protocol: Class<out PacketProtocol>, val factory: SessionFactory) {
+class Server(host: String, port: Int, protocol: Class<out PacketProtocol>, factory: SessionFactory) {
     private lateinit var listener: ConnectionListener
-    private var sessions = ArrayList<ServerListener>()
+    private var sessions = ArrayList<Session>()
     private var flags = HashMap<String, Any>()
     private var listeners = ArrayList<ServerListener>()
 
+    private var host = host
+    private var port = port
+    private var protocol = protocol
+    private var factory = factory
 
     fun bind(): Server {
         return this.bind(true)
@@ -24,7 +29,24 @@ class Server(val host: String, val port: Int, val protocol: Class<out PacketProt
 
     fun bind(wait: Boolean): Server {
         this.listener = this.factory.createServerListener(this)
-        this.listener.bind(wait, Runnable { })
+        this.listener.bind(wait, Runnable {
+            run {
+                callEvent(ServerBoundEvent(this@Server))
+            }
+        })
+        return this
+    }
+
+    fun getHost(): String {
+        return this.host
+    }
+
+    fun getPort(): Int {
+        return this.port
+    }
+
+    fun getPacketProtocol(): Class<out PacketProtocol> {
+        return this.protocol
     }
 
     @Throws(IllegalStateException::class)
@@ -43,10 +65,10 @@ class Server(val host: String, val port: Int, val protocol: Class<out PacketProt
     }
 
     fun getGlobalFlags(): Map<String, Any> {
-        return HashMap<String,Any>(this.flags)
+        return HashMap<String, Any>(this.flags)
     }
 
-    fun hasGlobalFlag(key:String): Boolean {
+    fun hasGlobalFlag(key: String): Boolean {
         return this.flags.containsKey(key)
     }
 
@@ -55,13 +77,63 @@ class Server(val host: String, val port: Int, val protocol: Class<out PacketProt
         try {
             return (value as T)
         } catch (exc: ClassCastException) {
-            throw IllegalStateException("Tried to get flag $key as the wrong type. Actual type: ${value::class.qualifiedName}")
+            throw IllegalStateException("Tried to get flag $key as the wrong type. Actual type: ${value!!.javaClass.simpleName}")
         }
     }
 
-    fun setGlobalFlag(key:String, value:Any) {
+    fun setGlobalFlag(key: String, value: Any) {
         this.flags[key] = value
     }
 
-    fun getListeners(): List<ServerListener>
+    fun getListeners(): List<ServerListener> {
+        return ArrayList<ServerListener>(this.listeners)
+    }
+
+    fun addListener(listener: ServerListener) {
+        this.listeners.add(listener)
+    }
+
+    fun removeListener(listener: ServerListener) {
+        this.listeners.remove(listener)
+    }
+
+    fun callEvent(event: ServerEvent) {
+        this.listeners.forEach { event.call(it) }
+    }
+
+    fun getSessions(): List<Session> {
+        return ArrayList<Session>(this.sessions)
+    }
+
+    fun addSession(session: Session) {
+        this.sessions.add(session)
+        this.callEvent(SessionAddedEvent(this, session))
+    }
+
+    fun removeSession(session: Session) {
+        this.sessions.remove(session)
+        if (session.isConnected()) {
+            session.disconnect("Connection closed")
+        }
+
+        this.callEvent(SessionRemovedEvent(this, session))
+    }
+
+    fun close() {
+        this.close(true)
+    }
+
+    fun close(wait: Boolean) {
+        this.callEvent(ServerClosingEvent(this))
+        this.getSessions().forEach {
+            if (it.isConnected()) {
+                it.disconnect("Server closed")
+            }
+        }
+        this.listener.close(wait, Runnable {
+            run {
+                callEvent(ServerClosedEvent(this@Server))
+            }
+        })
+    }
 }

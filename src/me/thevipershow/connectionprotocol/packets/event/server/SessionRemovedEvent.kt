@@ -8,8 +8,9 @@
 package me.thevipershow.connectionprotocol.packets.event.server
 
 import me.thevipershow.connectionprotocol.packets.Server
+import me.thevipershow.connectionprotocol.packets.Session
 
-class SessionRemovedEvent(val server: Server): ServerEvent {
+class SessionRemovedEvent(val server: Server, val session: Session): ServerEvent {
     override fun call(listener: ServerListener) {
         listener.sessionRemoved(this)
     }
