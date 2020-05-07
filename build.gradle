@@ -25,6 +25,9 @@ dependencies {
     compile group: 'dnsjava', name: 'dnsjava', version: '3.0.2'
 }
 
-shadowJar {
-    
+compileKotlin {
+    kotlinOptions.jvmTarget = "11"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "11"
 }
