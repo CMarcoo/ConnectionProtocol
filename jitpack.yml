@@ -1,0 +1,4 @@
+# Specifying JDK build version:
+# This repository will always require at least Java 9 to build properly, although 11 is recommended and stable.
+jdk:
+  - openjdk11
