@@ -25,3 +25,5 @@ hs_err_pid*
 # IntelliJ annoying stuff
 ConnectionProtocol.iml
 .idea
+build
+.gradle
